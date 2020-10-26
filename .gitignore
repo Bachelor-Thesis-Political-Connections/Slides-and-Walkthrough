@@ -14,6 +14,9 @@
 # Output files from R CMD build
 /*.tar.gz
 
+# DS Store shit
+.DS_Store
+
 # Output files from R CMD check
 /*.Rcheck/
 
