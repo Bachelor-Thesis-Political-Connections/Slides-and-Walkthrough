@@ -66,7 +66,18 @@ Also: try to read many articles! There is hardly any empirical study that does n
 
 ## Firm-level studies
 
-Finally, there are firm-level studies. Firm-level studies can either take a cross-section (a bunch of firms at one point in time), or a panel (a bunch of firms repeatedly observed over time) of firms in one or more country, and investigate aspects such as their **acounting performance**. Usually, these studies answer questions about the influence of the presence of a politician on firm performance. However, research questions can also be more divergent, in various directions. For example, politicians might influence a firm's actions in many ways. Through which _channels_ would politicians influence firm performance? Another direction might be the following: why do firms chose to hire politicians? Do particular firms do that? Which firms, and why? Do they chose a particular _type_ of politician? Another line of research is interested in the effects of privatization: do privatized firms perform better than state-owned firmed, or firms that have never been in the hands of the government? As a final example, politicians are (usually) sensitive to electoral pressure. Could that have an influence on their behavior in firms, and if so, how?
+Finally, there are firm-level studies. Firm-level studies can either take a cross-section (a bunch of firms at one point in time), or a panel (a bunch of firms repeatedly observed over time) of firms in one or more country, and investigate aspects such as their **acounting performance**. Usually, these studies answer questions about the influence of the presence of a politician on firm performance. However, research questions can also be more divergent, in various directions. For example, politicians might influence a firm's actions in many ways. 
+- Through which _channels_ would politicians influence firm performance? 
+
+Another direction might be the following: 
+- Why do firms chose to hire politicians? Do particular firms do that? Which firms, and why? 
+- Do they chose a particular _type_ of politician? 
+
+Another line of research is interested in the effects of privatization: 
+- Do privatized firms perform better than state-owned firmed, or firms that have never been in the hands of the government? 
+
+As a final example, politicians are (usually) sensitive to electoral pressure. 
+- Could that have an influence on their behavior in firms, and if so, how?
 
 ### Data sources
 
