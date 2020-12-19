@@ -2,9 +2,8 @@
 
 Welcome! In this repository, you can find:
 
-- The first lecture's slides
-- Several walkthroughs related to each one of the themes
-- A short description of possible themes (below) 
+- A short description of possible kinds of studies (below)
+- Several walkthroughs related to one or more kinds of studies
 
 ## Themes
 
@@ -14,15 +13,15 @@ Some of those questions seem appropriate for an audience of students aiming to w
 | Kind of study | Example: |
 | -------- | ----------- |
 | Event studies | Effect of state visits on stock prices |
-| Cross-country studies | Effect of relations between big business and politicians on economic growth |
+| Cross-country studies | Effect of relations between big business and politicians on economic growth or other outcomes |
 | Firm-level studies | Effect of a (former) politician on the Board of Directors on firm performance |
 
 ## Event studies
 
-Event studies are usually aiming to explain **abnormal returns** of stock prices around an important event that supposedly have an impact on firms' financial results. More often than not, it starts to get interesting when, for some reason, events are hypothesized to have **differential** impacts on different firms - that allows for a wide variety of hypotheses to be tested. 
+In our setting, event studies are usually aiming to explain **abnormal returns** of stock prices around an important event that supposedly have an impact on firms' financial results. More often than not, it starts to get interesting when, for some reason, events are hypothesized to have **differential** impacts on different firms - that allows for a wide variety of hypotheses to be tested. 
 
 A few example questions that can be answered using event studies can be:
-- What is the influence on value of connections to the president/prime minister of a country? 
+- What is the influence connections to a president/prime minister on firm value? 
 - When do political connections expire? Do firms with which politicians were affiliated in the past still benefit from their connections?
 - What is the value of having connections to a minister?
 - What is the influence of CEO's on their company's value?
@@ -71,7 +70,8 @@ Finally, there are firm-level studies. Firm-level studies can either take a cros
 
 Another direction might be the following: 
 - Why do firms chose to hire politicians? Do particular firms do that? Which firms, and why? 
-- Do they chose a particular _type_ of politician? 
+- Do firms chose a particular _type_ of politician when they decide to hire (former) politicians? 
+- Do political connections influence employment of firms?
 
 Another line of research is interested in the effects of privatization: 
 - Do privatized firms perform better than state-owned firmed, or firms that have never been in the hands of the government? 
