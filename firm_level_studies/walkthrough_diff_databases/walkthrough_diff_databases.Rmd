@@ -1,0 +1,214 @@
+---
+title: "Retrieving & Merging Data"
+author: "Bas Machielsen"
+date: "3/1/2021"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Suppose you want have retrieved the ISIN-numbers of a number of companies on which you want to do research. How do you look for those specific companies in Bureau van Dijk/Orbis?
+
+You effectuate a search with:
+  - Identifiers
+  - Stock and securities number
+    - You paste the ISIN numbers in there
+    
+How do you look for those specific companies in WRDS?
+    
+### Example
+
+Here is the Excel file on the basis of which you want to retrieve the data (note that I clean the Excel file to make it nicely visible in R): 
+
+```{r excel, message = FALSE, warning = FALSE}
+library(readxl); library(tidyverse)
+
+data <- readxl::read_xls("HDAX_ICR.20140131.xls", 
+                 sheet = 2) %>%
+  janitor::remove_empty() %>%
+  janitor::row_to_names(1) %>%
+  select(1:7) 
+
+data %>%
+  head()
+
+
+data <- data %>%
+  janitor::clean_names() %>%
+  select(trading_symbol, instrument, isin) %>%
+  distinct()
+```
+
+Then, I take the ISIN numbers (in the ISIN column) and go to Bureau van Dijk/Orbis and search for:
+
+- Identifiers
+  - Stock and securities number
+  - Paste all the ISIN numbers in there
+  - Alternatively, you can write the ISIN column to a text file and upload the text file to Orbis:
+  
+```{r upl to text file}
+data %>%
+  janitor::clean_names() %>%
+  select(isin) %>%
+  write_delim("isin_nos.txt",
+              col_names = FALSE)
+  
+```
+
+Note that the argument `col_names = FALSE` has to be included, because databases will not take the first line into account as a column name, but rather, as something to be looked for. It will therefore produce an error if you include it. 
+
+- Orbis will then let you know how many of the ISIN's have been found, and how many haven't been found. 
+
+After having looked up the _companies_ you want to find, you can look up the _variables_. To proceed to that stage, click **View results**. Then, suppose you want to look for the total assets of these companies, as well as for the names of the directors. 
+
+You go to: 
+
+  - Add/Remove Columns
+  - Identifiers
+  - Add ISIN, Tickers (So that you can find data on these companies in _every_ database, not only BvD/Orbis)
+
+Then, go to:
+  - Directors & Managers
+  - Other personal information
+  - Select Name & Last Name
+  - Possibly (but not done here), you can select Date of Installment, Date of Resignation
+
+Then, export the file to .xlsx (or any other extension you like). We can import these data in R now. It is important to run `tidyr::fill()` to fill the rows with their preceding values to do some data cleaning and aggregation later on. `fill()` takes on as arguments the columns that you want to apply this operation on. 
+
+```{r import data}
+
+directors <- read_xlsx("directors.xlsx") %>%
+  janitor::clean_names() %>%
+  select(-1) %>%
+  tidyr::fill(c(1:6))
+
+directors %>%
+  head()
+
+```
+
+Now, let's find some information about Bundestag members from Wikipedia:
+
+```{r bundestag, message = FALSE, warning = FALSE}
+library(rvest)
+
+bundestag <- read_html("https://en.wikipedia.org/wiki/List_of_members_of_the_17th_Bundestag") %>%
+  html_nodes("table.wikitable:nth-child(8)") %>%
+  html_table(fill = TRUE) %>%
+  purrr::reduce(as.data.frame)
+
+
+bundestag %>%
+  head()
+```
+
+Nice, but let's select only the names, and let's put it in the right order:
+
+```{r rightorder}
+
+bundestag <- bundestag %>%
+  janitor::clean_names() %>%
+  select(name) %>%
+  separate(name, into = c("last", "first"), sep = ",") %>%
+  mutate(first_last = paste(first, last)) %>%
+  select(first_last)
+
+bundestag %>%
+  head()
+
+```
+
+
+Let us now count matches between `directors` and `bundestag`:
+
+```{r matches dir bund, message = FALSE, warning = FALSE}
+
+library(stringdist)
+
+directors <- directors %>%
+  mutate(first_last = paste(first_name, last_name)) 
+```
+
+First, I paste the first and last name of the directors, so as to match with the first and last names of the Bundestag members, which I put into the same format.
+
+Secondly, I use the `amatch` function from the stringdist package to find whether the name of the director matches the name of a bundestag member. Then, I apply the `if_else` function on the outcome of that calculation. If the outcome of the calculation (which gives me a number, the position of the match in the `bundestag` data.farme) is different from 0, then, count it as a match ("yes"). Otherwise, no match ("no"). 
+
+```{r match dir sec}
+directors <- directors %>%
+  mutate(inpolitics = if_else(stringdist::amatch(first_last, bundestag$first_last, maxDist = 3) != 0,
+                         "yes", 
+                         "no")
+  )
+                         
+
+directors %>%
+  arrange(inpolitics)
+```
+
+Now, finally, let's merge this dataset on political connections with the data on companies, `data`, on the basis of ISIN. I understand this looks difficult, but what I am doing is this:
+
+1. I group the directors data frame according to ISIN. Now the data.frame consist of virtual 'mini data.frames', each one for each ISIN number. Then, I only select a certain name _once_ per company. Then, I want them to summarize the amount of occurrences of "yes' in the inpolitics variable, i.e., the matches! Then, finally, the `summarize` function makes sure I get the group-variable back. 
+
+```{r finmerge}
+
+no_of_pol_con_per_firm <- directors %>%
+  group_by(isin) %>%
+  distinct(first_last, .keep_all = TRUE) %>%
+  summarize(howmany = sum(inpolitics == "yes",
+                          na.rm = TRUE)
+            )
+
+no_of_pol_con_per_firm %>%
+  ungroup() %>%
+  arrange(desc(howmany))
+```
+
+Now, we can merge this with `data`, the data.frame we started with:
+
+```{r finmerge2}
+merged_data <- left_join(data, no_of_pol_con_per_firm, 
+          by = c("isin" = "isin"))
+
+
+head(merged_data) 
+```
+  
+  
+And we can chose to further clean it, because the ISIN's change over time: 
+
+
+```{r finalclean}
+final_data <- merged_data %>%
+  group_by(instrument) %>%
+  summarize(howmany = sum(howmany, na.rm = TRUE))
+```
+
+A quick visualization:
+
+```{r geom}
+final_data %>%
+  ggplot(aes(x = howmany)) + geom_bar() + 
+  xlab("How many political connections?") +
+  ylab("Frequency (no. of companies)")
+```
+
+### Additional information in WRDS
+
+Remember, that in data:
+
+```{r}
+head(data)
+```
+
+We also have Isin's, and tickers. We can use that information to find more data about these companies on WRDS if we want to!
+
+## Conclusion
+
+This file showed how to find political connections in a sample of German companies. More nuanced analyses would take into account also the dynamic nature of political connections, and beware of very common names. 
+
